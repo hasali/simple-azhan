@@ -5,7 +5,9 @@ export const shuffle = <T>(array:T[]):T[] =>{
     while (curIndex !== 0 ){
         const randIndex = Math.floor(Math.random() * curIndex)
         curIndex--
-        [result[curIndex], result[randIndex]] = [result[randIndex], result[curIndex]]
+        const temp = result[curIndex]
+        result[curIndex] = result[randIndex]
+        result[randIndex] = temp
     }
     
     return result
