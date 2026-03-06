@@ -73,7 +73,7 @@
     <Clock />
     <br/>
     <div>
-        <h3>Sehar Time: {prayerTimings.at(0)?.time.toLocaleTimeString([], {timeStyle:'short'})}</h3>
+        <h3>Sehri Time: {prayerTimings.at(0)?.time.toLocaleTimeString([], {timeStyle:'short'})}</h3>
         <h3>Zuhr Time: {prayerTimings.at(1)?.time.toLocaleTimeString([], {timeStyle:'short'})}</h3>
         <h3>Iftar Time: {prayerTimings.at(2)?.time.toLocaleTimeString([], {timeStyle:'short'})}</h3>
     </div>
