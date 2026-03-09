@@ -21,7 +21,6 @@
  
     let audioUnlocked = $state(false);
 
-    
     let audio:HTMLAudioElement
     let played = new SvelteSet()
 
@@ -79,7 +78,7 @@
     </div>
     <br/>
     {#if !audioUnlocked}
-    <button onclick={unlockAudio}>Enable Audio</button>
+    <button class="btn" onclick={unlockAudio}>Enable Audio</button>
 {/if}
     <audio bind:this={audio}></audio>
     
