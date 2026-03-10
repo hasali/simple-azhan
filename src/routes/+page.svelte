@@ -1,37 +1,56 @@
 <script lang="ts">
 	
-    import type { PageProps } from "./$types";
+   
     import { onMount } from 'svelte';
     import { shuffle } from '$lib/helpers/shuffler'
 	import { tracks } from '$lib/tracks';
     import Clock from '$lib/components/Clock.svelte'
 	import { SvelteDate, SvelteSet } from "svelte/reactivity";
-    
-    const { data }: PageProps = $props()
+    import { getSunTimes } from '$lib/helpers/sun';
+   
+    interface PrayerTiming {
+        time: Date;
+        src: string;
+    }
+    let prayerTimings = $state<PrayerTiming[]>([])
     let trackList = shuffle(tracks)
-    //need to convert the string array back to a an array of dates.
-    let prayerTimings = $derived(
-        (data.timesList ?? [])
-        .filter((t): t is string => !!t)
-        .map((t, i) => ({
-            time: new SvelteDate(t),
-            src: trackList[i % trackList.length].src
-        }))
-    )
- 
-    let audioUnlocked = $state(false);
-
+    let audioUnlocked = $state(false)
     let audio:HTMLAudioElement
     let played = new SvelteSet()
-
+    let timesList:Date[]=[]
+   
     const unlockAudio = () => {
         audio.play().then(() => {
             audio.pause();
             audioUnlocked = true;
         });
     }
-    //let testDate = Date.now() + 60000;
+    //let testDate = Date.now() + 30000;
     onMount(() => {
+        if(!navigator.geolocation){
+            console.error("Geolocation not supported")
+            return
+        }
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude
+            const lon = pos.coords.longitude
+            const date = new Date();      
+            const times = getSunTimes(date, lat, lon);
+            
+            console.log(lat, lon, times)
+            //load functions need to return data that is serializable
+            timesList= [
+                times.customDawn,
+                times.solarNoon,
+                times.sunset
+            ]   
+            prayerTimings = (timesList ?? []).map((t, i) => ({
+            time: new Date(t),
+            src: trackList[i % trackList.length].src
+        })) 
+         })
+        
+
         const tick = () => {
             const now = Date.now()
             for(const timing of prayerTimings ){

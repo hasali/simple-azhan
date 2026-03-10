@@ -5,7 +5,7 @@ SunCalc.addTime(-15, 'customDawn', 'customDusk');
 
 export const getSunTimes = (date: Date,lat: number,lon: number) => {
   return SunCalc.getTimes(date, lat, lon) as SunCalc.GetTimesResult & {
-    customDawn?: Date;
-    customDusk?: Date;
+    customDawn: Date;
+    customDusk: Date;
   };
 }
