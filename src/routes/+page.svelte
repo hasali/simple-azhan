@@ -3,10 +3,11 @@
    
     import { onMount } from 'svelte';
     import { shuffle } from '$lib/helpers/shuffler'
-	import { tracks } from '$lib/tracks';
+	import { tracks } from '$lib/data/tracks';
     import Clock from '$lib/components/Clock.svelte'
 	import { SvelteDate, SvelteSet } from "svelte/reactivity";
     import { getSunTimes } from '$lib/helpers/sun';
+	import Verse from '$lib/components/Verse.svelte';
    
     interface PrayerTiming {
         time: Date;
@@ -59,11 +60,15 @@
                 //console.log(now, targetTime, diff)
 
                 //create a safety windows of 5 seconds before and 60 seconds after
-                if(diff >= -5000 && diff <= 60000 && (!played.has(targetTime))){ 
+                if(diff >= -5000 && diff <= 120000 && (!played.has(targetTime))){ 
                     audio.src = timing.src              
                     audio?.play().catch(()=>{})
                     played.add(targetTime)
                 }
+                // else if(diff > 120000 && now > targetTime && !(played.has(targetTime)) ){
+                //     played.add(targetTime)
+                // }
+
             }                    
         }
 
@@ -138,5 +143,5 @@
     </div>
 
     <audio bind:this={audio}></audio>
-
+<Verse />
 </main>
