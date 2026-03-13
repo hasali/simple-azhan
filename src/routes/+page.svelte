@@ -3,7 +3,7 @@
     import { shuffle } from '$lib/helpers/shuffler'
 	import { tracks } from '$lib/data/tracks';
     import Clock from '$lib/components/Clock.svelte'
-	import { SvelteDate, SvelteSet } from "svelte/reactivity";
+	import { SvelteDate, SvelteMap, SvelteSet } from "svelte/reactivity";
     import { getSunTimes } from '$lib/helpers/sun';
 	import Verse from '$lib/components/Verse.svelte';
 	import { formatCountdown } from '$lib/helpers/formatCountdown';
@@ -17,12 +17,15 @@
         time: Date
         src: string
     }
+    const SAFETY_WINDOW = 2 * 60 * 1000 
+    let scheduledTimeouts = new SvelteMap<number, ReturnType<typeof setTimeout>>()
     let trackList = shuffle(tracks)
     let audioUnlocked = $state(false)
     let audio:HTMLAudioElement
-    let played = new SvelteSet()
+    let played = new SvelteSet<number>()
     let timesList = $state<sunCalcTiming[]>([])
-    
+    let currentDay = $state(new Date().toDateString())
+
     //A resuable current time, no need for multiple setIntervals/Timeouts
     const now = new SvelteDate()
     $effect(() => {
@@ -35,13 +38,22 @@
 
     //Bypass browser auto play policies
     const unlockAudio = () => {
-        audio.play().then(() => {
-            audio.pause();
-            audioUnlocked = true;
-        });
+
+        if (!audio) return
+
+        audio.src = '/audio/silent.mp3'
+
+        audio.play()
+            .then(() => {
+                audio.pause()
+                audio.currentTime = 0
+                audioUnlocked = true
+                console.log("audio unlocked")
+            })
+            .catch(err => console.log("unlock failed:", err))
     }
 
-   
+    //Create an array of timings matched with randomized audio tracks 
     const prayerTimings = $derived(
         (timesList ?? []).map(({ name, time }, i) => ({
             name,
@@ -50,8 +62,105 @@
         }))
     );
     
+    played = new SvelteSet(
+        prayerTimings
+            .filter(p => Date.now() - p.time.getTime() > SAFETY_WINDOW)
+            .map(p => p.time.getTime())
+    );
+    //Separate logic into three categories: rules for audio, scheduling, and missing scheduled time
+    const attemptPlay= ((prayer: PrayerTiming)=>{
+        const targetTime = prayer.time.getTime()
+        const diff = Date.now() - targetTime
+
+        if(played.has(targetTime)){
+            console.log("Yes, it has the target time")
+            return
+        } 
+            
+        if(diff > SAFETY_WINDOW) {
+            played.add(targetTime)   
+            return
+        }
+        if(!audioUnlocked){
+
+            console.log("The Audio is not unlocked")
+            return
+        } 
+            
+        audio.src = prayer.src
+
+        audio.play()
+            .then(()=>played.add(targetTime))
+            .catch(()=>{
+                setTimeout(()=>attemptPlay(prayer),5000)
+            })
+    })
+
+    const clearScheduled = (()=>{
+        for (const id of scheduledTimeouts.values()){
+             clearTimeout(id)
+        }
+        scheduledTimeouts.clear()
+    })
+
+    const schedulePrayers = (() => {
+        clearScheduled()
+
+        for (const prayer of prayerTimings){
+            const targetTime = prayer.time.getTime()
+            const delay = targetTime - Date.now()
+
+            if (delay <= -SAFETY_WINDOW )
+                continue
+
+            const id = setTimeout(() => {
+                attemptPlay(prayer)
+            }, delay)
+
+            scheduledTimeouts.set(targetTime, id)
+        }
+    })
+    const catchMissedPrayers = (() => {
+        for (const prayer of prayerTimings) {
+            attemptPlay(prayer)
+        }
+    })
+    
+        // Reset at midnight
+    const scheduleMidnightReset = (() => {
+        const nowTime = new Date();
+        // next midnight
+        const midnight = new Date(nowTime.getFullYear(), nowTime.getMonth(), nowTime.getDate() + 1);
+        const msUntilMidnight = midnight.getTime() - now.getTime();
+
+        setTimeout(() => {
+            // Reset for the new day
+            currentDay = new Date().toDateString();
+            played.clear();
+            localStorage.removeItem('prayerTimings');
+            localStorage.removeItem('prayerTimingsDate');
+
+            // Schedule the next reset
+            scheduleMidnightReset();
+        }, msUntilMidnight);
+    })
+
+    //Find prayers that have occured or have yet to play for UI logic
+    
+    const nextPrayer = $derived.by<PrayerTiming | null>(() => {        
+	    return prayerTimings.find(
+            p => p.time.getTime() > now.getTime() && !played.has(p.time.getTime())
+        ) ?? null
+    })
+
+    const nextPrayerCountdown = $derived.by(() => {
+        if (!nextPrayer) return 0
+
+        return nextPrayer.time.getTime() - now.getTime()
+    })
     //let testDate = Date.now() + 30000;
     onMount(() => {
+        
         const cached = localStorage.getItem('prayerTimings')
         const cacheDate = localStorage.getItem('prayerTimingsDate')
         const today = new Date().toDateString()
@@ -60,8 +169,7 @@
             timesList = JSON.parse(cached).map((t:sunCalcTiming) => ({
                 name: t.name,
                 time: new Date(t.time)
-            }))
-            
+            }))          
         }
         else if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition((pos) => {
@@ -73,8 +181,7 @@
                     times.solarNoon.getTime() +
                     (times.sunset.getTime() - times.solarNoon.getTime()) / 2
                 )
-                //console.log(lat, lon, times)
-            
+                //console.log(lat, lon, times)            
                 timesList= [
                     {
                         name: "Fajr",
@@ -105,61 +212,20 @@
                 )))
                 localStorage.setItem('prayerTimingsDate', today)
             }  
-       )}
-    })
-    $effect(()=>{
-        for(const timing of prayerTimings ){
-            const targetTime = timing.time.getTime()
-            const diff = now.getTime() - targetTime //so the prayer target time has passed if positive
-            
-            //console.log(now, targetTime, diff)
-            
-            //create a safety windows of 5 seconds before and 60 seconds after
-            if(diff >= -5000 && diff <= 120000 && (!played.has(targetTime))){ 
-                audio.src = timing.src              
-                audio?.play().catch(()=>{})
-                played.add(targetTime)
-            }
-            else if(diff > 120000 || !(played.has(targetTime)) ){
-                played.add(targetTime)
-            }   
-        }                    
-    })
-
-    //midnight reset incase the app is never closed 
-    
-    let currentDay = $state(new Date().toDateString())
-
-    $effect(() => {
-        const today = new Date(now.getTime()).toDateString()
-
-        if (today !== currentDay) {
-            currentDay = today
-            played.clear()
-
-            localStorage.removeItem('prayerTimings')
-            localStorage.removeItem('prayerTimingsDate')
+        )}
+        if (prayerTimings.length > 0) {
+            schedulePrayers()
+            catchMissedPrayers()
         }
-    }) 
-
-    //Find prayers that have occured or have yet to play for UI logic
-    
-    const nextPrayer = $derived.by<PrayerTiming | null>(() => {
-	    return prayerTimings.find(
-            p => p.time.getTime() > now.getTime()
-        ) ?? null
+        scheduleMidnightReset();
+        console.log(played)
+        console.log(scheduledTimeouts)
     })
-    const nextPrayerCountdown = $derived.by(()=>{
-        
-        let timeUntil = 0
-        if(nextPrayer)
-            timeUntil= nextPrayer.time.getTime() - now.getTime()
-	    return nextPrayer ? timeUntil : 0
-    })
-    $effect(() => {
-    console.log("timesList:", timesList)
-    console.log("prayerTimings:", prayerTimings)
-})
+    // $effect(() => {
+    //     console.log("timesList:", timesList)
+    //     console.log("prayerTimings:", prayerTimings)
+    //     console.log("tick: ", now.getTime())
+    // })
 </script>
 
 <header class="navbar bg-base-200 shadow-md">
@@ -179,21 +245,31 @@
 
             <div class="stats stats-vertical shadow">
                 {#each prayerTimings as prayer (prayer.name)}
-                <div class="stat">
-                    <div class="stat-title">{prayer.name}</div>
-                    {#if nextPrayer?.name === prayer.name}
-                        <div class="stat-value text-primary text-2xl">
-                            {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                    <div class="stat flex justify-between">
+                        {#if nextPrayer?.name === prayer.name}
+                        <div>
+
+                            <div class="stat-title text-secondary">{prayer.name}</div>
+                            <div class="stat-value text-secondary text-3xl">
+                                {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                            </div>
                         </div>
-                        <div class="stat-value text-primary text-sm">                       
-                            {formatCountdown(nextPrayerCountdown)}                       
+                            <div class="flex stat-value text-secondary text-sm items-end ">  
+                                <div>
+
+                                    {formatCountdown(nextPrayerCountdown)}                       
+                                </div>                     
+                            </div>
+                        {:else}
+                        <div>
+
+                            <div class="stat-title">{prayer.name}</div>
+                            <div class="stat-value text-primary text-xl">
+                                {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                            </div>
                         </div>
-                    {:else}
-                        <div class="stat-value text-gray-500 text-xl">
-                            {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
-                        </div>
-                    {/if}                   
-                </div>
+                        {/if}                   
+                    </div>
                 {/each}     
             </div>
             {#if !audioUnlocked}
