@@ -247,24 +247,32 @@
                 {#each prayerTimings as prayer (prayer.name)}
                     <div class="stat flex justify-between">
                         {#if nextPrayer?.name === prayer.name}
-                        <div>
+                            <div>
 
-                            <div class="stat-title text-secondary">{prayer.name}</div>
-                            <div class="stat-value text-secondary text-3xl">
-                                {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                                <div class="stat-title text-secondary">{prayer.name}</div>
+                                <div class="stat-value text-secondary text-3xl">
+                                    {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                                </div>
                             </div>
-                        </div>
                             <div class="flex stat-value text-secondary text-sm items-end ">  
                                 <div>
 
                                     {formatCountdown(nextPrayerCountdown)}                       
                                 </div>                     
                             </div>
+                        {:else if played.has(prayer.time.getTime())}
+                            <div>
+
+                                <div class="stat-title text-gray-400 italic">{prayer.name}</div>
+                                <div class="stat-value text-gray-400 text-lg italic">
+                                    {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                                </div>
+                            </div>
                         {:else}
                         <div>
 
-                            <div class="stat-title">{prayer.name}</div>
-                            <div class="stat-value text-primary text-xl">
+                            <div class="stat-title text-primary">{prayer.name}</div>
+                            <div class="stat-value text-primary text-2xl">
                                 {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                             </div>
                         </div>
