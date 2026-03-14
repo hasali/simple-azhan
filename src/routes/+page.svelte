@@ -62,11 +62,6 @@
         }))
     );
     
-    played = new SvelteSet(
-        prayerTimings
-            .filter(p => Date.now() - p.time.getTime() > SAFETY_WINDOW)
-            .map(p => p.time.getTime())
-    );
     //Separate logic into three categories: rules for audio, scheduling, and missing scheduled time
     const attemptPlay= ((prayer: PrayerTiming)=>{
         const targetTime = prayer.time.getTime()
@@ -158,6 +153,8 @@
 
         return nextPrayer.time.getTime() - now.getTime()
     })
+    const isPast = (prayer:PrayerTiming) =>
+        Date.now() - prayer.time.getTime() > SAFETY_WINDOW
     //let testDate = Date.now() + 30000;
     onMount(() => {
         
@@ -260,7 +257,7 @@
                                     {formatCountdown(nextPrayerCountdown)}                       
                                 </div>                     
                             </div>
-                        {:else if played.has(prayer.time.getTime())}
+                        {:else if isPast(prayer)}
                             <div>
 
                                 <div class="stat-title text-gray-400 italic">{prayer.name}</div>
