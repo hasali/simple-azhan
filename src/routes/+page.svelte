@@ -254,7 +254,7 @@
                                         {formatCountdown(nextPrayerCountdown)}                                        
                                     </div>
                                 </div>
-                                <div class="stat-value text-secondary text-4xl">
+                                <div class="stat-value text-secondary text-3xl">
                                     {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                                 </div>
                             
@@ -269,9 +269,9 @@
                         {:else}
                         
 
-                            <div class="stat-title text-primary text-xl w-3 font-bold">{prayer.name}</div>
+                            <div class="stat-title text-primary text-lg w-3 font-bold">{prayer.name}</div>
                             <div></div>
-                            <div class="stat-value text-primary text-3xl">
+                            <div class="stat-value text-primary text-2xl">
                                 {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                             </div>
                         {/if}                   
