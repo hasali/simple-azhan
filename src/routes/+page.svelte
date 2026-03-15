@@ -50,6 +50,7 @@
                 audio.currentTime = 0
                 audioUnlocked = true
                 console.log("audio unlocked")
+                catchMissedPrayers()
             })
             .catch(err => console.log("unlock failed:", err))
     }
