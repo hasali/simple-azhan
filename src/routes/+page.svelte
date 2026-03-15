@@ -246,35 +246,34 @@
                 {#each prayerTimings as prayer (prayer.name)}
                     <div class="stat flex justify-between">
                         {#if nextPrayer?.name === prayer.name}
-                            <div>
-
-                                <div class="stat-title text-secondary">{prayer.name}</div>
-                                <div class="stat-value text-secondary text-3xl">
-                                    {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
-                                </div>
-                            </div>
-                            <div class="flex stat-value text-secondary text-sm items-end ">  
+                            
                                 <div>
 
-                                    {formatCountdown(nextPrayerCountdown)}                       
-                                </div>                     
-                            </div>
+                                    <div class="stat-title text-secondary text-lg font-extrabold">{prayer.name}</div>
+                                    <div class="flex stat-value text-secondary text-sm  ">  
+                                        {formatCountdown(nextPrayerCountdown)}                                        
+                                    </div>
+                                </div>
+                                <div class="stat-value text-secondary text-2xl">
+                                    {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                                </div>
+                            
                         {:else if isPast(prayer)}
-                            <div>
+                            
 
-                                <div class="stat-title text-gray-400 italic">{prayer.name}</div>
+                                <div class="stat-title text-gray-400 italic font-bold">{prayer.name}</div>
+                                <div></div>
                                 <div class="stat-value text-gray-400 text-lg italic">
                                     {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                                 </div>
-                            </div>
                         {:else}
-                        <div>
+                        
 
-                            <div class="stat-title text-primary">{prayer.name}</div>
-                            <div class="stat-value text-primary text-2xl">
+                            <div class="stat-title text-primary text-sm w-3 font-bold">{prayer.name}</div>
+                            <div></div>
+                            <div class="stat-value text-primary text-xl">
                                 {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                             </div>
-                        </div>
                         {/if}                   
                     </div>
                 {/each}     
