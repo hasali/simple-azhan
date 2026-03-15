@@ -8,6 +8,7 @@
 	import Verse from '$lib/components/Verse.svelte';
 	import { formatCountdown } from '$lib/helpers/formatCountdown';
     
+    
     interface sunCalcTiming{
         name: string,
         time: Date
@@ -227,7 +228,7 @@
 
 <header class="navbar bg-base-200 shadow-md">
     <div class="navbar-center w-full justify-center">
-        <h1 class="text-2xl font-bold">Classic Azhan</h1>
+        <img src ="/ca-title.svg" alt="Site Logo">
     </div>
 </header>
 <main class="flex flex-col items-center gap-6 p-6">
