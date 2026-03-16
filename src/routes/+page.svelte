@@ -18,7 +18,9 @@
         time: Date
         src: string
     }
-    const SAFETY_WINDOW = 2 * 60 * 1000 
+
+    const EARLY_WINDOW = 2000        // 2 seconds
+    const LATE_WINDOW  = 120000      // 2 minutes
     let scheduledTimeouts = new SvelteMap<number, ReturnType<typeof setTimeout>>()
     let trackList = shuffle(tracks)
     let audioUnlocked = $state(false)
@@ -39,20 +41,22 @@
 
     //Bypass browser auto play policies
     const unlockAudio = () => {
-
+       
+//debugger
         if (!audio) return
-
+        
         audio.src = '/audio/silent.mp3'
 
-        audio.play()
-            .then(() => {
-                audio.pause()
-                audio.currentTime = 0
-                audioUnlocked = true
-                console.log("audio unlocked")
-                catchMissedPrayers()
-            })
-            .catch(err => console.log("unlock failed:", err))
+        const p = audio.play()
+        p.then(() => {
+            //debugger
+            audio.pause()
+            audio.currentTime = 0
+            audioUnlocked = true
+            console.log("audio unlocked")
+            catchMissedPrayers()
+        })
+        .catch(err => console.log("unlock failed:", err))
     }
 
     //Create an array of timings matched with randomized audio tracks 
@@ -65,31 +69,42 @@
     );
     
     //Separate logic into three categories: rules for audio, scheduling, and missing scheduled time
+    
     const attemptPlay= ((prayer: PrayerTiming)=>{
         const targetTime = prayer.time.getTime()
         const diff = Date.now() - targetTime
 
+        //Don't play if the time has past is already in the played set
         if(played.has(targetTime)){
-            console.log("Yes, it has the target time")
+            console.log("Yes, it has the target time", prayer)
             return
         } 
-            
-        if(diff > SAFETY_WINDOW) {
-            played.add(targetTime)   
-            return
-        }
+
+        //Don't play if the browser auto play policy hasn't been bypassed
         if(!audioUnlocked){
 
             console.log("The Audio is not unlocked")
             return
         } 
-            
+
+        //Don't play if the time is 2 seconds before the prayer time
+        if(diff < -EARLY_WINDOW) return   
+
+        //Don't play if the time is 2 minutes after the prayer time
+        if(diff > LATE_WINDOW) {
+            played.add(targetTime)   
+            return
+        }
+                  
         audio.src = prayer.src
 
         audio.play()
             .then(()=>played.add(targetTime))
-            .catch(()=>{
-                setTimeout(()=>attemptPlay(prayer),5000)
+            .catch(err=>{
+                console.log("play failed:", err)
+                if (Date.now() - targetTime < LATE_WINDOW) {
+                    setTimeout(()=>attemptPlay(prayer),5000)
+                }           
             })
     })
 
@@ -107,7 +122,7 @@
             const targetTime = prayer.time.getTime()
             const delay = targetTime - Date.now()
 
-            if (delay <= -SAFETY_WINDOW )
+            if (delay <= -EARLY_WINDOW )
                 continue
 
             const id = setTimeout(() => {
@@ -146,7 +161,7 @@
     
     const nextPrayer = $derived.by<PrayerTiming | null>(() => {        
 	    return prayerTimings.find(
-            p => p.time.getTime() > now.getTime() && !played.has(p.time.getTime())
+            p => p.time.getTime() > now.getTime()
         ) ?? null
     })
 
@@ -156,7 +171,7 @@
         return nextPrayer.time.getTime() - now.getTime()
     })
     const isPast = (prayer:PrayerTiming) =>
-        Date.now() - prayer.time.getTime() > SAFETY_WINDOW
+        Date.now() - prayer.time.getTime() > LATE_WINDOW
     //let testDate = Date.now() + 30000;
     onMount(() => {
         
@@ -217,8 +232,8 @@
             catchMissedPrayers()
         }
         scheduleMidnightReset();
-        console.log(played)
-        console.log(scheduledTimeouts)
+        // console.log(played)
+        // console.log(scheduledTimeouts)
     })
     // $effect(() => {
     //     console.log("timesList:", timesList)
@@ -244,17 +259,17 @@
 
             <div class="stats stats-vertical shadow">
                 {#each prayerTimings as prayer (prayer.name)}
-                    <div class="stat flex justify-between">
+                    <div class="stat flex justify-between items-start">
                         {#if nextPrayer?.name === prayer.name}
                             
-                                <div>
+                                <div class="">
 
                                     <div class="stat-title text-secondary text-xl font-extrabold">{prayer.name}</div>
-                                    <div class="flex stat-value text-secondary text-lg font-medium ">  
+                                    <div class="flex stat-value text-secondary text-sm font-medium ">  
                                         {formatCountdown(nextPrayerCountdown)}                                        
                                     </div>
                                 </div>
-                                <div class="stat-value text-secondary text-3xl">
+                                <div class="stat-value text-secondary text-[28px]">
                                     {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                                 </div>
                             
@@ -262,16 +277,16 @@
                             
 
                                 <div class="stat-title text-gray-400 italic text-lg font-bold">{prayer.name}</div>
-                                <div></div>
-                                <div class="stat-value text-gray-400 text-2xl italic">
+                                
+                                <div class="stat-value text-gray-400 text-xl italic">
                                     {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                                 </div>
                         {:else}
                         
 
-                            <div class="stat-title text-primary text-lg w-3 font-bold">{prayer.name}</div>
-                            <div></div>
-                            <div class="stat-value text-primary text-2xl">
+                            <div class="stat-title text-primary text-lg font-bold">{prayer.name}</div>
+                            
+                            <div class="stat-value text-primary text-xl">
                                 {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                             </div>
                         {/if}                   
