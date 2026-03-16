@@ -235,11 +235,6 @@
         // console.log(played)
         // console.log(scheduledTimeouts)
     })
-    // $effect(() => {
-    //     console.log("timesList:", timesList)
-    //     console.log("prayerTimings:", prayerTimings)
-    //     console.log("tick: ", now.getTime())
-    // })
 </script>
 
 <header class="navbar bg-base-200 shadow-md">
@@ -262,28 +257,23 @@
                     <div class="stat flex justify-between items-start">
                         {#if nextPrayer?.name === prayer.name}
                             
-                                <div class="">
-
-                                    <div class="stat-title text-secondary text-xl font-extrabold">{prayer.name}</div>
-                                    <div class="flex stat-value text-secondary text-sm font-medium ">  
-                                        {formatCountdown(nextPrayerCountdown)}                                        
-                                    </div>
+                            <div class="">
+                                <div class="stat-title text-secondary text-xl font-extrabold">{prayer.name}</div>
+                                <div class="flex stat-value text-secondary text-sm font-medium ">  
+                                    {formatCountdown(nextPrayerCountdown)}                                        
                                 </div>
-                                <div class="stat-value text-secondary text-[28px]">
-                                    {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
-                                </div>
+                            </div>
+                            <div class="stat-value text-secondary text-[28px]">
+                                {nextPrayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
+                            </div>
                             
-                        {:else if isPast(prayer)}
-                            
-
+                        {:else if isPast(prayer)}                            
                                 <div class="stat-title text-gray-400 italic text-lg font-bold">{prayer.name}</div>
                                 
                                 <div class="stat-value text-gray-400 text-xl italic">
                                     {prayer.time.toLocaleTimeString([], { timeStyle: 'short' })}
                                 </div>
                         {:else}
-                        
-
                             <div class="stat-title text-primary text-lg font-bold">{prayer.name}</div>
                             
                             <div class="stat-value text-primary text-xl">
