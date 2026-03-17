@@ -15,7 +15,7 @@
     }
     const msg = getDailyVerse(dailyVerses)
 </script>
-<div class="flex-col verse-container ">
+<div class="flex-col relative ">
     <img src="/verse-ceiling.svg" alt="lantern svg">
     <div class="verse text-2xl text-accent font-bold">
         <p dir="rtl">{msg.verseArab}</p>
@@ -38,16 +38,10 @@
     padding: 3rem;
     
 
-    /* Islamic ornamental border */
-    
-    /* inner panel */
    
 }
 
-/* Arabic verse */
 
-
-/* reference text */
 .verse-ref{
     text-align: center;
     opacity: 0.75;
