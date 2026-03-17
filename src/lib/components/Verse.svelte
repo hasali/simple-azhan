@@ -17,7 +17,6 @@
 </script>
 <div class="flex-col relative ">
     <div class="">
-
         <img src="/verse-ceiling.svg" alt="lantern svg">
     </div>
     <div class="verse text-2xl text-accent font-bold pt-3">

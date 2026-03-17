@@ -242,7 +242,7 @@
         <img src ="/ca-title.svg" alt="Site Logo">
     </div>
 </header>
-<main class="flex flex-col items-center gap-12 p-12">
+<main class="flex flex-col items-center gap-6 p-12">
 
     <div class="card bg-base-200 shadow-xl p-6">
         <Clock />
