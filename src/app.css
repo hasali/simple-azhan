@@ -7,9 +7,21 @@
   font-style: normal;
   font-display: swap; /* Recommended for performance */
 }
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/NotoNaskhArabic-Bold.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* Recommended for performance */
+}
 /* @theme {
   --font-math: "Cambria Math", serif;
 } */
 :root {
   font-family: 'Cambria Math', serif;
+}
+.verse{
+    font-family: 'Noto Naskh Arabic', 'serif';
+    direction: rtl;
+    unicode-bidi: isolate;
 }

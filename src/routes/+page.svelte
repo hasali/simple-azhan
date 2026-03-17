@@ -242,15 +242,15 @@
         <img src ="/ca-title.svg" alt="Site Logo">
     </div>
 </header>
-<main class="flex flex-col items-center gap-6 p-6">
+<main class="flex flex-col items-center gap-12 p-12">
 
     <div class="card bg-base-200 shadow-xl p-6">
         <Clock />
     </div>
 
-    <div class="card bg-base-100 shadow-xl w-full max-w-md">
+    <div class="card bg-base-100 shadow-md w-full max-w-md">
         <div class="card-body">
-            <h2 class="card-title justify-center">Prayer Times</h2>
+            <img src ="/mosque-vector.svg" alt="mosque vector">
 
             <div class="stats stats-vertical shadow">
                 {#each prayerTimings as prayer (prayer.name)}
@@ -295,5 +295,10 @@
     </div>
 
     <audio bind:this={audio}></audio>
-<Verse />
+    <div class="card shadow-xl">
+        <div class="card-body">
+
+            <Verse />
+        </div>
+    </div>
 </main>
