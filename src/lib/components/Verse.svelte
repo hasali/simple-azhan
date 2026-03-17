@@ -15,16 +15,15 @@
     }
     const msg = getDailyVerse(dailyVerses)
 </script>
-<div class="flex-col verse-container text-amber-200">
-    
-    <div class="verse text-3xl ">
+<div class="flex-col verse-container ">
+    <img src="/verse-ceiling.svg" alt="lantern svg">
+    <div class="verse text-2xl text-accent font-bold">
         <p dir="rtl">{msg.verseArab}</p>
     </div>
-    <div class="text-sm">
+    <div class="text-sm my-2">
 
-        <p class="verse-eng">{msg.verseEng}</p>
-        <p class="verse-ref">{msg.verseSurah}</p>
-        <p class="verse-ref">{msg.verseAyah}</p><br/>
+        <p class="italic">{msg.verseEng}</p>
+        <p class="verse-ref">{msg.verseSurah} {msg.verseAyah}</p>
         
         <p class="hadith">{msg.hadith}</p>
         <p class="hadith-src">{msg.hadithSrc}</p><br/>
@@ -36,37 +35,22 @@
 <style>
     .verse-container{
     position: relative;
-    padding: 4rem;
+    padding: 3rem;
     
 
     /* Islamic ornamental border */
-    background-image: url("/verse-frame.svg");
-    background-size: contain;
-background-repeat: no-repeat;
-background-position: center;
+    
     /* inner panel */
    
 }
 
 /* Arabic verse */
-.verse-arabic{
-    text-align: center;
-    line-height: 1.9;
-    margin-bottom: 1rem;
-    font-family: "Noto Naskh Arabic", serif;
-}
 
-/* English translation */
-.verse-eng{
-    font-style: italic;
-    
-    margin-bottom: 0.5rem;
-}
 
 /* reference text */
 .verse-ref{
     text-align: center;
-    opacity: 0.85;
+    opacity: 0.75;
 }
 
 /* hadith */
@@ -76,6 +60,7 @@ background-position: center;
 }
 
 .hadith-src{
+    text-align: center;
     opacity: 0.75;
 }
 
