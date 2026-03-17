@@ -16,11 +16,14 @@
     const msg = getDailyVerse(dailyVerses)
 </script>
 <div class="flex-col relative ">
-    <img src="/verse-ceiling.svg" alt="lantern svg">
-    <div class="verse text-2xl text-accent font-bold">
+    <div class="">
+
+        <img src="/verse-ceiling.svg" alt="lantern svg">
+    </div>
+    <div class="verse text-2xl text-accent font-bold pt-3">
         <p dir="rtl">{msg.verseArab}</p>
     </div>
-    <div class="text-sm my-2">
+    <div class="text-sm my-2 pt-3">
 
         <p class="italic">{msg.verseEng}</p>
         <p class="verse-ref">{msg.verseSurah} {msg.verseAyah}</p>

@@ -248,7 +248,7 @@
         <Clock />
     </div>
 
-    <div class="card bg-base-100 shadow-md w-full max-w-lg sm:max-w-md">
+    <div class="card bg-base-100 shadow-md w-full max-w-xl sm:max-w-md">
         <div class="card-body">
             <img src ="/mosque-vector.svg" alt="mosque vector">
 
