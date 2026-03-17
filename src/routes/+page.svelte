@@ -248,7 +248,7 @@
         <Clock />
     </div>
 
-    <div class="card bg-base-100 shadow-md w-full max-w-md">
+    <div class="card bg-base-100 shadow-md w-full max-w-lg sm:max-w-md">
         <div class="card-body">
             <img src ="/mosque-vector.svg" alt="mosque vector">
 
@@ -292,13 +292,13 @@
             {/if}
 
         </div>
+        <div class="card shadow-xl">
+            <div class="card-body">
+    
+                <Verse />
+            </div>
+        </div>
     </div>
 
     <audio bind:this={audio}></audio>
-    <div class="card shadow-xl">
-        <div class="card-body">
-
-            <Verse />
-        </div>
-    </div>
 </main>
