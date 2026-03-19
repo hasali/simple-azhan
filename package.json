@@ -40,7 +40,9 @@
 	},
 	"dependencies": {
 		"@types/suncalc": "^1.9.2",
+		"islamic-date": "^0.1.8",
 		"openmeteo": "^1.2.3",
-		"suncalc": "^1.9.0"
+		"suncalc": "^1.9.0",
+		"vite-plugin-pwa": "^1.2.0"
 	}
 }

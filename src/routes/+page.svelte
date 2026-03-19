@@ -7,7 +7,7 @@
     import { getSunTimes } from '$lib/helpers/sun';
 	import Verse from '$lib/components/Verse.svelte';
 	import { formatCountdown } from '$lib/helpers/formatCountdown';
-    
+    //import { getCurrentHijriDate } from "islamic-date"
     
     interface sunCalcTiming{
         name: string,
@@ -28,7 +28,8 @@
     let played = new SvelteSet<number>()
     let timesList = $state<sunCalcTiming[]>([])
     let currentDay = $state(new Date().toDateString())
-
+    
+    //const hijri = getCurrentHijriDate({ language: "en"})
     //A resuable current time, no need for multiple setIntervals/Timeouts
     const now = new SvelteDate()
     $effect(() => {
@@ -237,10 +238,12 @@
     })
 </script>
 
-<header class="navbar bg-base-200 shadow-md">
-    <div class="navbar-center w-full justify-center">
+<header class="navbar bg-base-200 shadow-md p-0">
+    <div class="navbar-start"></div>
+    <div class="navbar-center justify-center w-70 sm:w-sm">
         <img src ="/ca-title.svg" alt="Site Logo">
     </div>
+    <div class="navbar-end"></div>
 </header>
 <main class="flex flex-col items-center gap-6 p-12">
 
@@ -248,9 +251,9 @@
         <Clock />
     </div>
 
-    <div class="card bg-base-100 shadow-md w-full max-w-xl sm:max-w-md">
+    <div class="card bg-base-100 shadow-md w-full min-w-sm sm:max-w-md">
         <div class="card-body">
-            <img src ="/mosque-vector.svg" alt="mosque vector">
+            <img src ="/ca-mosque-vector.svg" alt="mosque vector">
 
             <div class="stats stats-vertical shadow">
                 {#each prayerTimings as prayer (prayer.name)}
@@ -285,7 +288,7 @@
             </div>
             {#if !audioUnlocked}
                 <div class="card-actions justify-center mt-4">
-                    <button class="btn btn-primary" onclick={unlockAudio}>
+                    <button class="btn btn-secondary" onclick={unlockAudio}>
                         Enable Audio
                     </button>
                 </div>

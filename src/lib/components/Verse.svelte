@@ -15,55 +15,33 @@
     }
     const msg = getDailyVerse(dailyVerses)
 </script>
-<div class="flex-col relative ">
+<div class="">
     <div class="">
-        <img src="/verse-ceiling.svg" alt="lantern svg">
+        <img src="/ca-verse-ceiling.svg" alt="lantern svg">
     </div>
-    <div class="verse text-2xl text-accent font-bold pt-3">
-        <p dir="rtl">{msg.verseArab}</p>
-    </div>
-    <div class="text-sm my-2 pt-3">
+    <div class="">           
+        <div class="verse text-2xl text-amber-200 font-bold border-b border-amber-400 border-dashed ">
+            <p class="pt-2 pb-1" dir="rtl">{msg.verseArab}</p>
+        </div>       
+        <div class=" my-3 italic text-amber-100 flex flex-col items-center">
+            <div class="self-start py-2 w-full">              
+                <p>{msg.verseEng}</p>
+                <div class="text-center text-gray-400">                        
+                    <p>{msg.verseSurah} {msg.verseAyah}</p>
 
-        <p class="italic">{msg.verseEng}</p>
-        <p class="verse-ref">{msg.verseSurah} {msg.verseAyah}</p>
-        
-        <p class="hadith">{msg.hadith}</p>
-        <p class="hadith-src">{msg.hadithSrc}</p><br/>
-        
-        
-    </div>
+                </div>
+            </div>
+            <div class="w-10 h-10 my-3">
 
+                <img class="" src="/ca-divider.svg" alt="UI divider logo">
+            </div>
+            
+            <div class="self-start py-2 w-full">               
+                <p>{msg.hadith}</p>
+                <div class="text-center text-gray-400">                  
+                    <p class="text-gray-400">{msg.hadithSrc}</p><br/>
+                </div>
+            </div>
+        </div>  
+    </div>
 </div>
-<style>
-    .verse-container{
-    position: relative;
-    padding: 3rem;
-    
-
-   
-}
-
-
-.verse-ref{
-    text-align: center;
-    opacity: 0.75;
-}
-
-/* hadith */
-.hadith{
-    margin-top: 1rem;
-    font-style: italic;
-}
-
-.hadith-src{
-    text-align: center;
-    opacity: 0.75;
-}
-
-/* theme */
-.theme{
-    margin-top: 0.5rem;
-    font-weight: 500;
-    opacity: 0.9;
-}
-</style>
